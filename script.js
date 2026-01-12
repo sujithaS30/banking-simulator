@@ -27,7 +27,7 @@ function createAccount(){
     });
 }
 
-function deposite(){
+function deposit(){
      const data={
         accNo : document.getElementById("d-acc").value,
         amount : document.getElementById("d-amount").value
