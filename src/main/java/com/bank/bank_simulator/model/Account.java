@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountNumber;
 
     private String name;
