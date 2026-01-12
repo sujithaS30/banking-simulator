@@ -27,43 +27,46 @@ function createAccount(){
     });
 }
 
-function deposit(){
-     const data={
-        accNo : document.getElementById("d-acc").value,
-        amount : document.getElementById("d-amount").value
-     };
+function deposite() {
+    const accNo = document.getElementById("d-acc").value;
+    const amount = document.getElementById("d-amount").value;
 
-      fetch(BASE_URL+"/transactions/deposite" , {
-        method :"POST",
-        headers :{
-             "Content-Type" : "application/json"
-        },
-        body :JSON.stringify(data)
+    fetch(BASE_URL + "/accounts/" + accNo + "/deposite", {
+        method: "PUT", // POST kedaiyaathu, PUT thaan correct
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: parseFloat(amount) })
     })
-    .then(res => res.text())
-    .then(msg => {
-        document.getElementById("deposite-result").innerText=msg;
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("deposite-result").innerText = "Success! New Balance: " + data.balance;
+    })
+    .catch(err => {
+        document.getElementById("deposite-result").innerText = "Error! Account number check pannunga.";
     });
 }
 
 function withdraw(){
-     const data={
-        accNo : document.getElementById("w-acc").value,
-        amount : document.getElementById("w-amount").value
-     };
+    const accNo = document.getElementById("w-acc").value;
+    const amount = document.getElementById("w-amount").value;
 
-      fetch(BASE_URL+"/transactions/withdraw" , {
-        method :"POST",
-        headers :{
-             "Content-Type" : "application/json"
+    fetch(BASE_URL + "/accounts/" + accNo + "/withdraw", {
+        method: "PUT",
+        headers: {
+             "Content-Type": "application/json"
         },
-        body :JSON.stringify(data)
+        body: JSON.stringify({ amount: parseFloat(amount) })
     })
-    .then(res => res.text())
-    .then(msg => {
-        document.getElementById("withdraw-result").innerText=msg;
+    .then(res => {
+        if(!res.ok) throw new Error("Insufficient Funds");
+        return res.json();
+    })
+    .then(data => {
+        document.getElementById("withdraw-result").innerText = "Withdraw Success! New Balance: " + data.balance;
+    })
+    .catch(err => {
+        document.getElementById("withdraw-result").innerText = err.message;
     });
-}         
+}
 
 function transfer(){
     const data={
