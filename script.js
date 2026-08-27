@@ -1,4 +1,4 @@
-const BASE_URL="https://banking-simulator-v8mo.onrender.com";
+const BASE_URL = "https://your-render-backend-url.onrender.com";
 
 function showSection(id){
     document.querySelectorAll(".section").forEach(sec=> sec.style.display ='none');
