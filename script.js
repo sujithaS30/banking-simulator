@@ -1,105 +1,159 @@
-const BASE_URL = "https://your-render-backend-url.onrender.com";
+// Render backend Live URL update pannunga (Deploy mudindhadhum)
+const BASE_URL = "https://your-backend-name.onrender.com";
 
-function showSection(id){
-    document.querySelectorAll(".section").forEach(sec=> sec.style.display ='none');
-    document.getElementById(id).style.display='block';
-}
-
-//create account
-
-function createAccount(){
-    const data={
-        name :document.getElementById("c-name").value,
-        email : document.getElementById("c-email").value,
-        balance : document.getElementById("c-balance").value
-    };
-
-    fetch(BASE_URL+"/accounts/create" , {
-        method :"POST",
-        headers :{
-             "Content-Type" : "application/json"
-        },
-        body :JSON.stringify(data)
-    })
-    .then(res => res.json())
-    .then(result => {
-        document.getElementById("create-result").innerText="Account is Created and here is your Account Number"+result.accountNumber
+// 1. Create Account
+async function createAccount() {
+    const { value: formValues } = await Swal.fire({
+        title: 'Create Account',
+        html:
+            '<input id="swal-name" class="swal2-input" placeholder="Account Holder Name">' +
+            '<input id="swal-balance" type="number" class="swal2-input" placeholder="Initial Balance">',
+        focusConfirm: false,
+        showCancelButton: true,
+        preConfirm: () => {
+            return [
+                document.getElementById('swal-name').value,
+                document.getElementById('swal-balance').value
+            ]
+        }
     });
-}
 
-function deposite() {
-    const accNo = document.getElementById("d-acc").value;
-    const amount = document.getElementById("d-amount").value;
-
-    fetch(BASE_URL + "/accounts/" + accNo + "/deposite", {
-        method: "PUT", // POST kedaiyaathu, PUT thaan correct
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: parseFloat(amount) })
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("deposite-result").innerText = "Success! New Balance: " + data.balance;
-    })
-    .catch(err => {
-        document.getElementById("deposite-result").innerText = "Error! Account number check pannunga.";
-    });
-}
-
-function withdraw(){
-    const accNo = document.getElementById("w-acc").value;
-    const amount = document.getElementById("w-amount").value;
-
-    fetch(BASE_URL + "/accounts/" + accNo + "/withdraw", {
-        method: "PUT",
-        headers: {
-             "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ amount: parseFloat(amount) })
-    })
-    .then(res => {
-        if(!res.ok) throw new Error("Insufficient Funds");
-        return res.json();
-    })
-    .then(data => {
-        document.getElementById("withdraw-result").innerText = "Withdraw Success! New Balance: " + data.balance;
-    })
-    .catch(err => {
-        document.getElementById("withdraw-result").innerText = err.message;
-    });
-}
-
-function transfer(){
-    const data={
-        fromAcc : document.getElementById("t-from").value,
-        toAcc :document.getElementById("t-to").value,
-        amount :document.getElementById("t-amount").value
+    if (formValues && formValues[0] && formValues[1]) {
+        try {
+            const response = await fetch(`${BASE_URL}/api/accounts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    accountHolderName: formValues[0],
+                    balance: parseFloat(formValues[1])
+                })
+            });
+            const data = await response.json();
+            Swal.fire('Success', `Account Created! ID: ${data.id}`, 'success');
+        } catch (err) {
+            Swal.fire('Error', 'Failed to connect to backend service', 'error');
+        }
     }
-    fetch(BASE_URL+"/transactions/transfer" , {
-        method :"POST",
-        headers :{
-             "Content-Type" : "application/json"
-        },
-        body :JSON.stringify(data)
-    })
-    .then(res => res.text())
-    .then(msg => {
-        document.getElementById("transfer-result").innerText=msg;
-    });
 }
 
-function viewAccount(){
-   const acc= document.getElementById("v-acc").value;
-   fetch(BASE_URL+"/accounts/"+acc)
-   .then(res => res.json())
-   .then(data => {
-    document.getElementById("view-result").innerText =JSON.stringify(data);
-   });
+// 2. Deposit
+async function deposit() {
+    const { value: formValues } = await Swal.fire({
+        title: 'Deposit Money',
+        html:
+            '<input id="swal-id" type="number" class="swal2-input" placeholder="Account ID">' +
+            '<input id="swal-amount" type="number" class="swal2-input" placeholder="Deposit Amount">',
+        focusConfirm: false,
+        showCancelButton: true,
+        preConfirm: () => {
+            return [
+                document.getElementById('swal-id').value,
+                document.getElementById('swal-amount').value
+            ]
+        }
+    });
+
+    if (formValues && formValues[0] && formValues[1]) {
+        try {
+            const response = await fetch(`${BASE_URL}/api/accounts/${formValues[0]}/deposit`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: parseFloat(formValues[1]) })
+            });
+            const data = await response.json();
+            Swal.fire('Success', `Updated Balance: $${data.balance}`, 'success');
+        } catch (err) {
+            Swal.fire('Error', 'Deposit failed!', 'error');
+        }
+    }
 }
 
-function listAccount(){
-    fetch(BASE_URL+"/accounts/all")
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("list-result").innerText = JSON.stringify(data);
+// 3. Withdraw
+async function withdraw() {
+    const { value: formValues } = await Swal.fire({
+        title: 'Withdraw Money',
+        html:
+            '<input id="swal-id" type="number" class="swal2-input" placeholder="Account ID">' +
+            '<input id="swal-amount" type="number" class="swal2-input" placeholder="Withdraw Amount">',
+        focusConfirm: false,
+        showCancelButton: true,
+        preConfirm: () => {
+            return [
+                document.getElementById('swal-id').value,
+                document.getElementById('swal-amount').value
+            ]
+        }
     });
+
+    if (formValues && formValues[0] && formValues[1]) {
+        try {
+            const response = await fetch(`${BASE_URL}/api/accounts/${formValues[0]}/withdraw`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: parseFloat(formValues[1]) })
+            });
+            const data = await response.json();
+            Swal.fire('Success', `Remaining Balance: $${data.balance}`, 'success');
+        } catch (err) {
+            Swal.fire('Error', 'Withdrawal failed!', 'error');
+        }
+    }
+}
+
+// 4. View Account
+async function viewAccount() {
+    const { value: id } = await Swal.fire({
+        title: 'View Account Details',
+        input: 'number',
+        inputPlaceholder: 'Enter Account ID',
+        showCancelButton: true
+    });
+
+    if (id) {
+        try {
+            const response = await fetch(`${BASE_URL}/api/accounts/${id}`);
+            const data = await response.json();
+            document.getElementById('output').innerHTML = `
+                <h3>Account Details</h3>
+                <p><strong>ID:</strong> ${data.id}</p>
+                <p><strong>Holder Name:</strong> ${data.accountHolderName}</p>
+                <p><strong>Balance:</strong> $${data.balance}</p>
+            `;
+        } catch (err) {
+            Swal.fire('Error', 'Account not found!', 'error');
+        }
+    }
+}
+
+// 5. View All Accounts
+async function viewAllAccounts() {
+    try {
+        const response = await fetch(`${BASE_URL}/api/accounts`);
+        const data = await response.json();
+        
+        let tableHTML = `
+            <h3>All Accounts</h3>
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Account Holder Name</th>
+                    <th>Balance</th>
+                </tr>
+        `;
+        
+        data.forEach(acc => {
+            tableHTML += `
+                <tr>
+                    <td>${acc.id}</td>
+                    <td>${acc.accountHolderName}</td>
+                    <td>$${acc.balance}</td>
+                </tr>
+            `;
+        });
+        
+        tableHTML += `</table>`;
+        document.getElementById('output').innerHTML = tableHTML;
+    } catch (err) {
+        Swal.fire('Error', 'Failed to fetch accounts!', 'error');
+    }
 }
