@@ -19,7 +19,7 @@ async function createAccount() {
 
     if (formValues && formValues[0] && formValues[1]) {
         try {
-            const response = await fetch(`${BASE_URL}/api/accounts`, {
+            const response = await fetch(`${BASE_URL}/accounts/create`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -28,7 +28,7 @@ async function createAccount() {
                 })
             });
             const data = await response.json();
-            Swal.fire('Success', `Account Created! ID: ${data.id}`, 'success');
+            Swal.fire('Success', `Account Created Successfully!`, 'success');
         } catch (err) {
             Swal.fire('Error', 'Failed to connect to backend service', 'error');
         }
@@ -40,7 +40,7 @@ async function deposit() {
     const { value: formValues } = await Swal.fire({
         title: 'Deposit Money',
         html:
-            '<input id="swal-id" type="number" class="swal2-input" placeholder="Account ID">' +
+            '<input id="swal-id" type="number" class="swal2-input" placeholder="Account Number">' +
             '<input id="swal-amount" type="number" class="swal2-input" placeholder="Deposit Amount">',
         focusConfirm: false,
         showCancelButton: true,
@@ -54,7 +54,7 @@ async function deposit() {
 
     if (formValues && formValues[0] && formValues[1]) {
         try {
-            const response = await fetch(`${BASE_URL}/api/accounts/${formValues[0]}/deposit`, {
+            const response = await fetch(`${BASE_URL}/accounts/${formValues[0]}/deposite`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ amount: parseFloat(formValues[1]) })
@@ -72,7 +72,7 @@ async function withdraw() {
     const { value: formValues } = await Swal.fire({
         title: 'Withdraw Money',
         html:
-            '<input id="swal-id" type="number" class="swal2-input" placeholder="Account ID">' +
+            '<input id="swal-id" type="number" class="swal2-input" placeholder="Account Number">' +
             '<input id="swal-amount" type="number" class="swal2-input" placeholder="Withdraw Amount">',
         focusConfirm: false,
         showCancelButton: true,
@@ -86,7 +86,7 @@ async function withdraw() {
 
     if (formValues && formValues[0] && formValues[1]) {
         try {
-            const response = await fetch(`${BASE_URL}/api/accounts/${formValues[0]}/withdraw`, {
+            const response = await fetch(`${BASE_URL}/accounts/${formValues[0]}/withdraw`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ amount: parseFloat(formValues[1]) })
@@ -104,18 +104,17 @@ async function viewAccount() {
     const { value: id } = await Swal.fire({
         title: 'View Account Details',
         input: 'number',
-        inputPlaceholder: 'Enter Account ID',
+        inputPlaceholder: 'Enter Account Number',
         showCancelButton: true
     });
 
     if (id) {
         try {
-            const response = await fetch(`${BASE_URL}/api/accounts/${id}`);
+            const response = await fetch(`${BASE_URL}/accounts/${id}`);
             const data = await response.json();
             document.getElementById('output').innerHTML = `
                 <h3>Account Details</h3>
-                <p><strong>ID:</strong> ${data.id}</p>
-                <p><strong>Holder Name:</strong> ${data.accountHolderName}</p>
+                <p><strong>Holder Name:</strong> ${data.accountHolderName || data.name}</p>
                 <p><strong>Balance:</strong> $${data.balance}</p>
             `;
         } catch (err) {
@@ -127,15 +126,14 @@ async function viewAccount() {
 // 5. View All Accounts
 async function viewAllAccounts() {
     try {
-        const response = await fetch(`${BASE_URL}/api/accounts`);
+        const response = await fetch(`${BASE_URL}/accounts/all`);
         const data = await response.json();
         
         let tableHTML = `
             <h3>All Accounts</h3>
             <table>
                 <tr>
-                    <th>ID</th>
-                    <th>Account Holder Name</th>
+                    <th>Holder Name</th>
                     <th>Balance</th>
                 </tr>
         `;
@@ -143,8 +141,7 @@ async function viewAllAccounts() {
         data.forEach(acc => {
             tableHTML += `
                 <tr>
-                    <td>${acc.id}</td>
-                    <td>${acc.accountHolderName}</td>
+                    <td>${acc.accountHolderName || acc.name}</td>
                     <td>$${acc.balance}</td>
                 </tr>
             `;
