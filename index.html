@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Banking Application</title>
     
-    <!-- CSS Link -->
+    <!-- External CSS -->
     <link rel="stylesheet" href="style.css">
 
-    <!-- SweetAlert2 CDN for modern alerts -->
+    <!-- SweetAlert2 CDN for Interactive Popups -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -25,11 +25,12 @@
             <button type="button" onclick="viewAllAccounts()">View All Account</button>
         </div>
 
-        <!-- Display Area for Data Output -->
-        <div id="output" class="output-container"></div>
+        <div id="output" class="output-container">
+            <p style="text-align: center; color: #777;">Select an option above to perform bank operations.</p>
+        </div>
     </div>
 
-    <!-- External JavaScript Link -->
+    <!-- External JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
