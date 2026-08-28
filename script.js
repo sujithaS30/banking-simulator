@@ -1,5 +1,4 @@
-// Render backend Live URL update pannunga (Deploy mudindhadhum)
-const BASE_URL = "https://banking-backend-6cnf.onrender.com/";
+const BASE_URL = "https://banking-backend-6cnf.onrender.com";
 
 // 1. Create Account
 async function createAccount() {
