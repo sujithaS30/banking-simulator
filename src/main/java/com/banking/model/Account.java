@@ -1,46 +1,48 @@
 package com.bank.bank_simulator.model;
+
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "accounts")
 public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long accountNumber;
+    private Long accNo;
 
-    private String name;
-    private String email;
-    private double balance;
+    private String accountHolderName;
+    private Double balance;
 
-    public Long getAccountNumber() {
-        return accountNumber;
+    // Default Constructor
+    public Account() {}
+
+    public Account(String accountHolderName, Double balance) {
+        this.accountHolderName = accountHolderName;
+        this.balance = balance;
     }
 
-    public void setAccountNumber(Long accountNumber) {
-        this.accountNumber = accountNumber;
+    // Getters and Setters
+    public Long getAccNo() {
+        return accNo;
     }
 
-    public String getName() {
-        return name;
+    public void setAccNo(Long accNo) {
+        this.accNo = accNo;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getAccountHolderName() {
+        return accountHolderName;
     }
 
-    public String getEmail() {
-        return email;
+    public void setAccountHolderName(String accountHolderName) {
+        this.accountHolderName = accountHolderName;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public double getBalance() {
+    public Double getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(Double balance) {
         this.balance = balance;
     }
 }
