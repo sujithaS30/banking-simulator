@@ -30,7 +30,6 @@ public class AccountController {
         return repo.findAll();
     }
 
-    // --- DEPOSIT LOGIC (Ithai thaan neenga miss panniteenga) ---
     @PutMapping("/{accNo}/deposite")
     public Account deposit(@PathVariable Long accNo, @RequestBody Map<String, Double> request) {
         Account account = repo.findById(accNo).orElseThrow(() -> new RuntimeException("Account not found"));
@@ -39,7 +38,6 @@ public class AccountController {
         return repo.save(account);
     }
 
-    // --- WITHDRAW LOGIC ---
     @PutMapping("/{accNo}/withdraw")
     public Account withdraw(@PathVariable Long accNo, @RequestBody Map<String, Double> request) {
         Account account = repo.findById(accNo).orElseThrow(() -> new RuntimeException("Account not found"));
