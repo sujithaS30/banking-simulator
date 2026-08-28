@@ -9,12 +9,10 @@ async function createAccount() {
             '<input id="swal-balance" type="number" class="swal2-input" placeholder="Initial Balance">',
         focusConfirm: false,
         showCancelButton: true,
-        preConfirm: () => {
-            return [
-                document.getElementById('swal-name').value,
-                document.getElementById('swal-balance').value
-            ]
-        }
+        preConfirm: () => [
+            document.getElementById('swal-name').value,
+            document.getElementById('swal-balance').value
+        ]
     });
 
     if (formValues && formValues[0] && formValues[1]) {
@@ -28,9 +26,9 @@ async function createAccount() {
                 })
             });
             const data = await response.json();
-            Swal.fire('Success', `Account Created Successfully!`, 'success');
+            Swal.fire('Success', `Account Created! Account No: ${data.accNo || data.id}`, 'success');
         } catch (err) {
-            Swal.fire('Error', 'Failed to connect to backend service', 'error');
+            Swal.fire('Error', 'Failed to create account', 'error');
         }
     }
 }
@@ -44,12 +42,10 @@ async function deposit() {
             '<input id="swal-amount" type="number" class="swal2-input" placeholder="Deposit Amount">',
         focusConfirm: false,
         showCancelButton: true,
-        preConfirm: () => {
-            return [
-                document.getElementById('swal-id').value,
-                document.getElementById('swal-amount').value
-            ]
-        }
+        preConfirm: () => [
+            document.getElementById('swal-id').value,
+            document.getElementById('swal-amount').value
+        ]
     });
 
     if (formValues && formValues[0] && formValues[1]) {
@@ -62,7 +58,7 @@ async function deposit() {
             const data = await response.json();
             Swal.fire('Success', `Updated Balance: $${data.balance}`, 'success');
         } catch (err) {
-            Swal.fire('Error', 'Deposit failed!', 'error');
+            Swal.fire('Error', 'Deposit failed! Invalid Account No', 'error');
         }
     }
 }
@@ -76,12 +72,10 @@ async function withdraw() {
             '<input id="swal-amount" type="number" class="swal2-input" placeholder="Withdraw Amount">',
         focusConfirm: false,
         showCancelButton: true,
-        preConfirm: () => {
-            return [
-                document.getElementById('swal-id').value,
-                document.getElementById('swal-amount').value
-            ]
-        }
+        preConfirm: () => [
+            document.getElementById('swal-id').value,
+            document.getElementById('swal-amount').value
+        ]
     });
 
     if (formValues && formValues[0] && formValues[1]) {
@@ -94,12 +88,48 @@ async function withdraw() {
             const data = await response.json();
             Swal.fire('Success', `Remaining Balance: $${data.balance}`, 'success');
         } catch (err) {
-            Swal.fire('Error', 'Withdrawal failed!', 'error');
+            Swal.fire('Error', 'Withdrawal failed! Check balance or Account No', 'error');
         }
     }
 }
 
-// 4. View Account
+// 4. Transfer
+async function transfer() {
+    const { value: formValues } = await Swal.fire({
+        title: 'Transfer Money',
+        html:
+            '<input id="swal-from" type="number" class="swal2-input" placeholder="Sender Account No">' +
+            '<input id="swal-to" type="number" class="swal2-input" placeholder="Receiver Account No">' +
+            '<input id="swal-amount" type="number" class="swal2-input" placeholder="Transfer Amount">',
+        focusConfirm: false,
+        showCancelButton: true,
+        preConfirm: () => [
+            document.getElementById('swal-from').value,
+            document.getElementById('swal-to').value,
+            document.getElementById('swal-amount').value
+        ]
+    });
+
+    if (formValues && formValues[0] && formValues[1] && formValues[2]) {
+        try {
+            const response = await fetch(`${BASE_URL}/accounts/transfer`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fromAccNo: parseInt(formValues[0]),
+                    toAccNo: parseInt(formValues[1]),
+                    amount: parseFloat(formValues[2])
+                })
+            });
+            if (!response.ok) throw new Error("Transfer Failed");
+            Swal.fire('Success', 'Transfer Completed Successfully!', 'success');
+        } catch (err) {
+            Swal.fire('Error', 'Transfer Failed! Check Account details & Balance', 'error');
+        }
+    }
+}
+
+// 5. View Account
 async function viewAccount() {
     const { value: id } = await Swal.fire({
         title: 'View Account Details',
@@ -114,6 +144,7 @@ async function viewAccount() {
             const data = await response.json();
             document.getElementById('output').innerHTML = `
                 <h3>Account Details</h3>
+                <p><strong>Account No:</strong> ${data.accNo || data.id}</p>
                 <p><strong>Holder Name:</strong> ${data.accountHolderName || data.name}</p>
                 <p><strong>Balance:</strong> $${data.balance}</p>
             `;
@@ -123,7 +154,7 @@ async function viewAccount() {
     }
 }
 
-// 5. View All Accounts
+// 6. View All Accounts
 async function viewAllAccounts() {
     try {
         const response = await fetch(`${BASE_URL}/accounts/all`);
@@ -133,6 +164,7 @@ async function viewAllAccounts() {
             <h3>All Accounts</h3>
             <table>
                 <tr>
+                    <th>Acc No</th>
                     <th>Holder Name</th>
                     <th>Balance</th>
                 </tr>
@@ -141,6 +173,7 @@ async function viewAllAccounts() {
         data.forEach(acc => {
             tableHTML += `
                 <tr>
+                    <td>${acc.accNo || acc.id}</td>
                     <td>${acc.accountHolderName || acc.name}</td>
                     <td>$${acc.balance}</td>
                 </tr>
